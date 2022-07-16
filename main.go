@@ -1,8 +1,8 @@
 package main
 
 import (
-	"errors"
 	"fmt"
+	"html/template"
 	"net/http"
 )
 
@@ -12,52 +12,35 @@ const portNumber = ":8080" // http://localhost:8080/
 //* Handler Functions
 // Home is the home page handler function
 func Home(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "This is the home page")
+	// call the renderTemplate function to render the home page
+	renderTemplate(w, "home.html")
 }
 
 // About is the about page handler function
 func About(w http.ResponseWriter, r *http.Request) {
-	// call the addValues function
-	sum := addValues(2, 2)
-	fmt.Fprintf(w, "This is the about page and 2 + 2 is %d", sum)
+	// call the renderTemplate function to render the about page
+	renderTemplate(w, "about.html")
 }
 
-func Divide(w http.ResponseWriter, r *http.Request) {
-	// call the divideValues function
-	f, err := divideValues(100, 0)
-	// check for error
+// renderTemplate is a function that renders the specified template to the response writer
+func renderTemplate(w http.ResponseWriter, html string) {
+	// Load the template from the templates folder and parse it into a html template object
+	parsedTemplate, _ := template.ParseFiles("./templates/" + html)
+	err := parsedTemplate.Execute(w, nil)
+	// check for any errors
 	if err != nil {
-		fmt.Fprintf(w, "Error: %s", err)
-		return // exit function
+		fmt.Printf("Error parsing template: %v\n", err)
 	}
-
-	fmt.Fprintf(w, "The result is %f", f)
-}
-
-//* Normal Functions
-// addValues is a function that adds two given integers
-func addValues(x, y int) int {
-	return x + y
-}
-
-// divideValues is a function that divides two given floats
-func divideValues(x, y float64) (float64, error) {
-	// Check for divide by zero
-	if y == 0 {
-		err := errors.New("CANNOT DIVIDE BY ZERO")
-		return 0, err
-	}
-	result := x / y
-	return result, nil
 }
 
 //* Main Function
 // main is the main application function
 func main() {
+	// call the http.HandleFunc function to register the Home and About handlers
 	http.HandleFunc("/", Home)
 	http.HandleFunc("/about", About)
-	http.HandleFunc("/divide", Divide)
 
-	fmt.Printf("Starting server on port %s\n", portNumber)
+	// call the http.ListenAndServe function to start the server
+	fmt.Printf("Starting server on port %v\n", portNumber)
 	http.ListenAndServe(portNumber, nil)
 }

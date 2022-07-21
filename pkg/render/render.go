@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 
 	"github.com/bagashiz/Go-Basic-Web-App/pkg/config"
+	"github.com/bagashiz/Go-Basic-Web-App/pkg/models"
 )
 
 // functions is a variable that holds the FuncMap for the templates
@@ -21,8 +22,14 @@ func NewTemplates(a *config.AppConfig) {
 	app = a
 }
 
+// AddDefaultFunctions is a function that adds the default data from TemplateData to the pages
+func AddDefaultData(td *models.TemplateData) *models.TemplateData {
+
+	return td
+}
+
 // RenderTemplate is a function that renders a template
-func RenderTemplate(w http.ResponseWriter, html string) {
+func RenderTemplate(w http.ResponseWriter, html string, td *models.TemplateData) {
 	// create a variable that holds the template cache
 	var tc map[string]*template.Template
 
@@ -46,8 +53,11 @@ func RenderTemplate(w http.ResponseWriter, html string) {
 	// create buffer to hold the rendered html
 	buf := new(bytes.Buffer)
 
+	// set the template data
+	td = AddDefaultData(td)
+
 	// execute the template
-	h.Execute(buf, nil)
+	h.Execute(buf, td)
 
 	// render the template
 	_, err := buf.WriteTo(w)

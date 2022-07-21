@@ -1,4 +1,4 @@
-package main
+package render
 
 import (
 	"fmt"
@@ -6,8 +6,8 @@ import (
 	"net/http"
 )
 
-// renderTemplate is a function that renders the specified template to the response writer
-func renderTemplate(w http.ResponseWriter, html string) {
+// RenderTemplate is a function that renders the specified template to the response writer
+func RenderTemplate(w http.ResponseWriter, html string) {
 	// Load the template from the templates folder and parse it into a html template object
 	parsedTemplate, _ := template.ParseFiles("./templates/" + html)
 	err := parsedTemplate.Execute(w, nil)

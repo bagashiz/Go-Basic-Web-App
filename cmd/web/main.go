@@ -27,9 +27,21 @@ func main() {
 	// set the template cache
 	app.TemplateCache = tc
 
+	// set UseCache to false
+	app.UseCache = false
+
+	// create a variable that holds the repository
+	repo := handlers.NewRepo(&app)
+
+	// pass the repository to the handlers
+	handlers.NewHandlers(repo)
+
+	// call the renderTemplate function to render the pages
+	render.NewTemplates(&app)
+
 	// call the http.HandleFunc function to register the Home and About handlers
-	http.HandleFunc("/", handlers.Home)
-	http.HandleFunc("/about", handlers.About)
+	http.HandleFunc("/", handlers.Repo.Home)
+	http.HandleFunc("/about", handlers.Repo.About)
 
 	// call the http.ListenAndServe function to start the server
 	fmt.Printf("Starting server on port %v\n", portNumber)

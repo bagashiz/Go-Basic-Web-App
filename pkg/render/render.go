@@ -6,24 +6,41 @@ import (
 	"log"
 	"net/http"
 	"path/filepath"
+
+	"github.com/bagashiz/Go-Basic-Web-App/pkg/config"
 )
+
+// functions is a variable that holds the FuncMap for the templates
+var functions = template.FuncMap{}
+
+// app is a variable that holds the application configuration
+var app *config.AppConfig
+
+// NewTemplates is a function that sets the application configuration to the template package
+func NewTemplates(a *config.AppConfig) {
+	app = a
+}
 
 // RenderTemplate is a function that renders a template
 func RenderTemplate(w http.ResponseWriter, html string) {
-	// create template cache
-	templateCache, err := CreateTemplateCache()
-	// check for any errors
-	if err != nil {
-		// exit the application
-		log.Fatal(err)
+	// create a variable that holds the template cache
+	var tc map[string]*template.Template
+
+	// check if the cache is in use
+	if app.UseCache {
+		// get the template cache from the application configuration
+		tc = app.TemplateCache
+	} else {
+		// create a new template cache
+		tc, _ = CreateTemplateCache()
 	}
 
 	// get the requested template from the cache
-	h, ok := templateCache[html]
+	h, ok := tc[html]
 	// check if the template is in the cache
 	if !ok {
 		// exit the application
-		log.Fatal(err)
+		log.Fatal("Cannot get template: ", html)
 	}
 
 	// create buffer to hold the rendered html
@@ -33,7 +50,7 @@ func RenderTemplate(w http.ResponseWriter, html string) {
 	h.Execute(buf, nil)
 
 	// render the template
-	_, err = buf.WriteTo(w)
+	_, err := buf.WriteTo(w)
 	// check for any errors
 	if err != nil {
 		log.Printf("Error writing template %v: %v\n", html, err)

@@ -39,11 +39,18 @@ func main() {
 	// call the renderTemplate function to render the pages
 	render.NewTemplates(&app)
 
-	// call the http.HandleFunc function to register the Home and About handlers
-	http.HandleFunc("/", handlers.Repo.Home)
-	http.HandleFunc("/about", handlers.Repo.About)
+	// create a variable to serve the application
+	srv := &http.Server{
+		Addr:    portNumber,
+		Handler: routes(&app),
+	}
 
-	// call the http.ListenAndServe function to start the server
+	// call the srv.ListenAndServe function to start the server
+	err = srv.ListenAndServe()
+	// check for any errors
+	if err != nil {
+		log.Fatal("Error starting server: ", err)
+	}
+
 	fmt.Printf("Starting server on port %v\n", portNumber)
-	http.ListenAndServe(portNumber, nil)
 }
